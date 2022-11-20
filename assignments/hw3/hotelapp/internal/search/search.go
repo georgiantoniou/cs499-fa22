@@ -86,6 +86,14 @@ func (s *Search) Run() error {
 
 func (s *Search) initGeoClient() error {
 	// TODO: Implement me
+	
+		conn, err := dialer.Dial(s.geoAddr, s.tracer)
+		if err != nil {
+			return fmt.Errorf("did not connect to profile service: %v", err)
+		}
+		s.geoClient = profile.NewGeoClient(conn)
+		return nil
+	
 }
 
 func (s *Search) initRateClient() error {
@@ -97,4 +105,30 @@ func (s *Search) Nearby(ctx context.Context, req *pb.NearbyRequest) (*pb.SearchR
 	// TODO: Implement me
 	// HINT: Reuse the implementation from the monolithic implementation 
 	// HINT: and modify as needed.
+	// find nearby hotels
+	nearby, err := s.geo.Nearby(&geo.Request{
+		Lat: req.Lat,
+		Lon: req.Lon,
+	})
+	if err != nil {
+		log.Fatalf("nearby error: %v", err)
+	}
+
+	// find rates for hotels
+	rates, err := s.rate.GetRates(&rate.RateRequest{
+		HotelIds: nearby.HotelIds,
+		InDate:   req.InDate,
+		OutDate:  req.OutDate,
+	})
+	if err != nil {
+		log.Fatalf("rates error: %v", err)
+	}
+
+	// build the response
+	res := new(SearchResult)
+	for _, ratePlan := range rates.RatePlans {
+		res.HotelIds = append(res.HotelIds, ratePlan.HotelId)
+	}
+
+	return res, nil
 }
