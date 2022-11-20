@@ -56,6 +56,13 @@ func (s *Frontend) Run() error {
 
 func (s *Frontend) initProfileClient() error {
 	// TODO: Implement me	
+	conn, err := dialer.Dial(s.profileAddr, s.tracer)
+		if err != nil {
+		return fmt.Errorf("did not connect to profile service: %v", err)
+	}
+	s.profileClient = profile.NewProfileClient(conn)
+	return nil
+
 }
 
 func (s *Frontend) initSearchClient() error {
@@ -110,7 +117,15 @@ func (s *Frontend) searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// hotel profiles
-	// TODO: Implement me	
+	// TODO: Implement me
+	profileResp, err := s.profileClient.GetProfiles(ctx, &profile.Request{
+	  HotelIds: searchResp.HotelIds,
+	  Locale:   locale,
+	})
+	if err != nil {
+	  http.Error(w, err.Error(), http.StatusInternalServerError)
+	  return
+	}	
 
 	json.NewEncoder(w).Encode(geoJSONResponse(profileResp.Hotels))
 }

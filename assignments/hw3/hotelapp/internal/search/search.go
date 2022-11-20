@@ -86,10 +86,22 @@ func (s *Search) Run() error {
 
 func (s *Search) initGeoClient() error {
 	// TODO: Implement me
+	conn, err := dialer.Dial(s.geoAddr, s.tracer)
+	if err != nil {
+		return fmt.Errorf("did not connect to geo service: %v", err)
+	}
+	s.geoClient = geo.NewGeoClient(conn)
+	return nil
 }
 
 func (s *Search) initRateClient() error {
 	// TODO: Implement me
+        conn, err := dialer.Dial(s.rateAddr, s.tracer)
+        if err != nil {
+                return fmt.Errorf("did not connect to rate service: %v", err)
+        }
+        s.rateClient = rate.NewRateClient(conn)
+        return nil
 }
 
 // Nearby returns ids of nearby hotels ordered by ranking algo
