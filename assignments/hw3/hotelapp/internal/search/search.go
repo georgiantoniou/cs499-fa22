@@ -85,7 +85,6 @@ func (s *Search) Run() error {
 
 func (s *Search) initGeoClient() error {
 	// TODO: Implement me
-<<<<<<< HEAD
 	
 	conn, err := dialer.Dial(s.geoAddr, s.tracer)
 	if err != nil {
@@ -93,13 +92,11 @@ func (s *Search) initGeoClient() error {
 	}
 	s.geoClient = geo.NewGeoClient(conn)
 	return nil
-<<<<<<< HEAD
 	
 }
 
 func (s *Search) initRateClient() error {
 	// TODO: Implement me
-<<<<<<< HEAD
 	conn, err := dialer.Dial(s.rateAddr, s.tracer)
     if err != nil {
         return fmt.Errorf("did not connect to rate service: %v", err)
