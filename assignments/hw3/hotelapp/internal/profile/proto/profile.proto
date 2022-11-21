@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package profile;
 
+<<<<<<< HEAD
 service Profile {
   rpc GetProfiles(Request) returns (Result);
 }

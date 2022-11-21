@@ -119,13 +119,13 @@ func (s *Frontend) searchHandler(w http.ResponseWriter, r *http.Request) {
 	// hotel profiles
 	// TODO: Implement me
 	profileResp, err := s.profileClient.GetProfiles(ctx, &profile.Request{
-		HotelIds: searchResp.HotelIds,
-		Locale:   locale,
-	  })
-	  if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	  }
+	  HotelIds: searchResp.HotelIds,
+	  Locale:   locale,
+	})
+	if err != nil {
+	  http.Error(w, err.Error(), http.StatusInternalServerError)
+	  return
+	}	
 
 	json.NewEncoder(w).Encode(geoJSONResponse(profileResp.Hotels))
 

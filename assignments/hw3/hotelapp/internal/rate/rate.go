@@ -37,7 +37,6 @@ func NewRate(a string, p int, db *DatabaseSession, tr opentracing.Tracer) *Rate 
 // Run starts the server
 func (s *Rate) Run() error {
 	// TODO: Implement me
-
 	if s.port == 0 {
 		return fmt.Errorf("server port must be set")
 	}
@@ -81,30 +80,29 @@ func (s *Rate) GetRates(ctx context.Context, req *pb.Request) (*pb.Result, error
 	// TODO: Implement me
 	// HINT: Reuse the implementation from the monolithic implementation 
 	// HINT: and modify as needed.
-
 	res := new(pb.Result)
 
-    ratePlans, err := s.dbsession.GetRates(req.HotelIds)
-    if err != nil {
-        return nil, err
-    }
-    finalRatePlans := make(RatePlans, 0)
+        ratePlans, err := s.dbsession.GetRates(req.HotelIds)
+        if err != nil {
+                return nil, err
+        }
+        finalRatePlans := make(RatePlans, 0)
 
-    start, _ := time.Parse("2006-01-02", req.InDate)
-    end, _ := time.Parse("2006-01-02", req.OutDate)
+        start, _ := time.Parse("2006-01-02", req.InDate)
+        end, _ := time.Parse("2006-01-02", req.OutDate)
 
-    sort.Sort(ratePlans)
-    for _, rateplan := range ratePlans {
-        in, _ := time.Parse("2006-01-02", rateplan.InDate)
-        out, _ := time.Parse("2006-01-02", rateplan.OutDate)
-        if inTimeSpan(in, out, start) && inTimeSpan(in, out, end) {
-            finalRatePlans = append(finalRatePlans, rateplan)
-         }
-    }
+        sort.Sort(ratePlans)
+        for _, rateplan := range ratePlans {
+                in, _ := time.Parse("2006-01-02", rateplan.InDate)
+                out, _ := time.Parse("2006-01-02", rateplan.OutDate)
+                if inTimeSpan(in, out, start) && inTimeSpan(in, out, end) {
+                        finalRatePlans = append(finalRatePlans, rateplan)
+                }
+        }
 
-    res.RatePlans = finalRatePlans
+        res.RatePlans = finalRatePlans
 
-    return res, nil
+        return res, nil
 
 }
 

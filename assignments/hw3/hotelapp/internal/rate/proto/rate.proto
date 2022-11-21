@@ -5,17 +5,17 @@ package rate;
 // TODO: Implement me
 
 service Rate {
-  rpc GetRates(Request) returns (Result);
+	rpc GetRates(RateRequest) returns (RateResult);
 }
 
-message Request {
-  repeated string hotelIds = 1;
-  string InDate = 2;
-  string OutDate = 3;
+message RateRequest {
+	repeated string hotelIds = 1;
+	string InDate = 2;
+	string OutDate = 3;
 }
 
-message Result {
-  repeated RatePlan RatePlans = 1;
+message RateResult {
+	repeated RatePlan RatePlans = 1;	
 }
 
 message RatePlan {
