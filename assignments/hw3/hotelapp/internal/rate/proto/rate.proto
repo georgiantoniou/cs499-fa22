@@ -19,6 +19,17 @@ message Result {
 }
 
 message RatePlan {
+	string HotelId = 1;
+	string Code = 2;
+	string InDate = 3;
+	string OutDate = 4;
+	RoomType roomType = 5;
+}
 
-
+message RoomType {
+	float BookableRate = 1;
+	string Code = 2;
+	string RoomDescription = 3;
+	float TotalRate = 4;
+	float TotalRateInclusive = 5;
 }

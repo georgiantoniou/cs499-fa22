@@ -42,54 +42,67 @@ func NewSearch(a string, p int, geoaddr string, rateaddr string, t opentracing.T
 
 // Run starts the server
 func (s *Search) Run() error {
-	func (s *Search) Run() error {
-		if s.port == 0 {
-			return fmt.Errorf("server port must be set")
-		}
-	
-		opts := []grpc.ServerOption{
-			grpc.KeepaliveParams(keepalive.ServerParameters{
-				Timeout: 120 * time.Second,
-			}),
-			grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
-				PermitWithoutStream: true,
-			}),
-			grpc.UnaryInterceptor(
-				otgrpc.OpenTracingServerInterceptor(s.tracer),
-			),
-		}
-	
-		srv := grpc.NewServer(opts...)
-		pb.RegisterSearchServer(srv, s)
-	
-		// Register reflection service on gRPC server.
-		reflection.Register(srv)
-	
-		// init grpc clients
-		if err := s.initGeoClient(); err != nil {
-			return err
-		}
-		if err := s.initRateClient(); err != nil {
-			return err
-		}
-	
-		// listener
-		lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.port))
-		if err != nil {
-			log.Fatalf("failed to listen: %v", err)
-		}
-	
-		log.Printf("Start Search server. Addr: %s:%d\n", s.addr, s.port)
-		return srv.Serve(lis)
+	if s.port == 0 {
+		return fmt.Errorf("server port must be set")
 	}
+	
+	opts := []grpc.ServerOption{
+		grpc.KeepaliveParams(keepalive.ServerParameters{
+			Timeout: 120 * time.Second,
+		}),
+		grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
+			PermitWithoutStream: true,
+		}),
+		grpc.UnaryInterceptor(
+			otgrpc.OpenTracingServerInterceptor(s.tracer),
+		),
+	}
+	
+	srv := grpc.NewServer(opts...)
+	pb.RegisterSearchServer(srv, s)
+	
+	// Register reflection service on gRPC server.
+	reflection.Register(srv)
+	
+	// init grpc clients
+	if err := s.initGeoClient(); err != nil {
+		return err
+	}
+	if err := s.initRateClient(); err != nil {
+		return err
+	}
+	
+	// listener
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.port))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	
+	log.Printf("Start Search server. Addr: %s:%d\n", s.addr, s.port)
+	return srv.Serve(lis)
 }
+
 
 func (s *Search) initGeoClient() error {
 	// TODO: Implement me
+	
+	conn, err := dialer.Dial(s.geoAddr, s.tracer)
+	if err != nil {
+		return fmt.Errorf("did not connect to geo service: %v", err)
+	}
+	s.geoClient = geo.NewGeoClient(conn)
+	return nil
+	
 }
 
 func (s *Search) initRateClient() error {
 	// TODO: Implement me
+	conn, err := dialer.Dial(s.rateAddr, s.tracer)
+    if err != nil {
+        return fmt.Errorf("did not connect to rate service: %v", err)
+    }
+    s.rateClient = rate.NewRateClient(conn)
+    return nil
 }
 
 // Nearby returns ids of nearby hotels ordered by ranking algo
@@ -97,4 +110,30 @@ func (s *Search) Nearby(ctx context.Context, req *pb.NearbyRequest) (*pb.SearchR
 	// TODO: Implement me
 	// HINT: Reuse the implementation from the monolithic implementation 
 	// HINT: and modify as needed.
+	// find nearby hotels
+	nearby, err := s.geoClient.Nearby(ctx,&geo.Request{
+		Lat: req.Lat,
+		Lon: req.Lon,
+	})
+	if err != nil {
+		log.Fatalf("nearby error: %v", err)
+	}
+
+	// find rates for hotels
+	rates, err := s.rateClient.GetRates(ctx,&rate.Request{
+		HotelIds: nearby.HotelIds,
+		InDate:   req.InDate,
+		OutDate:  req.OutDate,
+	})
+	if err != nil {
+		log.Fatalf("rates error: %v", err)
+	}
+
+	// build the response
+	res := new(pb.SearchResult)
+	for _, ratePlan := range rates.RatePlans {
+		res.HotelIds = append(res.HotelIds, ratePlan.HotelId)
+	}
+
+	return res, nil
 }
