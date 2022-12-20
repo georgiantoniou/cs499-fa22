@@ -11,7 +11,7 @@ services:
       restart_policy:
         condition: none          
       placement:
-        constraints: ["node.hostname == node0.assignment.ucy-cs499-dc-pg0.utah.cloudlab.us"]   
+        constraints: ["node.hostname == node0.assign4.ucy-cs499-dc-pg0.wisc.cloudlab.us"]   
 
   profile:
     build: .
@@ -24,7 +24,7 @@ services:
       restart_policy:
         condition: none        
       placement:
-        constraints: ["node.hostname == node1.assignment.ucy-cs499-dc-pg0.utah.cloudlab.us"]  
+        constraints: ["node.hostname == node1.assign4.ucy-cs499-dc-pg0.wisc.cloudlab.us"]  
 
   search:
     build: .
@@ -37,7 +37,7 @@ services:
       restart_policy:
         condition: none          
       placement:
-        constraints: ["node.hostname == node2.assignment.ucy-cs499-dc-pg0.utah.cloudlab.us"]  
+        constraints: ["node.hostname == node2.assign4.ucy-cs499-dc-pg0.wisc.cloudlab.us"]  
 
   geo:
     build: .
@@ -50,7 +50,7 @@ services:
       restart_policy:
         condition: none          
       placement:
-        constraints: ["node.hostname == node3.assignment.ucy-cs499-dc-pg0.utah.cloudlab.us"]  
+        constraints: ["node.hostname == node3.assign4.ucy-cs499-dc-pg0.wisc.cloudlab.us"]  
 
   rate:
     build: .
@@ -63,7 +63,7 @@ services:
       restart_policy:
         condition: none          
       placement:
-        constraints: ["node.hostname == node4.assignment.ucy-cs499-dc-pg0.utah.cloudlab.us"]  
+        constraints: ["node.hostname == node4.assign4.ucy-cs499-dc-pg0.wisc.cloudlab.us"]  
 
   jaeger:
       image: jaegertracing/all-in-one:latest
@@ -81,4 +81,4 @@ services:
         restart_policy:
           condition: none          
         placement:
-          constraints: ["node.hostname == node5.assignment.ucy-cs499-dc-pg0.utah.cloudlab.us"]  
+          constraints: ["node.hostname == node5.assign4.ucy-cs499-dc-pg0.wisc.cloudlab.us"]  
