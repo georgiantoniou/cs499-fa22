@@ -30,9 +30,8 @@ services:
     build: .
     image: hotel_app_search_single_node_memdb
     entrypoint: search
-    container_name: 'hotel_app_search'
     ports:
-      - "8082:8082"
+      - "8082"
     deploy:
       restart_policy:
         condition: none          
